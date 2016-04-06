@@ -1,0 +1,68 @@
+<?
+$locale = "{$argv[1]}.{$argv[2]}";
+$domain = basename(__FILE__,".phtml");
+$directory = dirname(__FILE__).'/locale';
+putenv('LC_ALL='.$argv[1].'.'.$argv[2]);
+setlocale(LC_MESSAGES, $locale);
+bindtextdomain($domain, $directory);
+textdomain($domain);
+bind_textdomain_codeset($domain, $argv[2]);
+$rdir = preg_split('/_/',$argv[1]);
+?>
+<html style='background-color: transparent'>
+<head>
+  <title>Pokedex</title>	
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1">     
+  <link rel="stylesheet" href="img/web1x_24dp.css" type="text/css" charset="utf-8"/>  
+  <link rel="stylesheet" href="pokemons.css" type="text/css" charset="utf-8" />  
+  <link rel="stylesheet" href="roboto.css" type="text/css" charset="utf-8"/>
+  <link rel="stylesheet" href="waves.min.css" type="text/css" charset="utf-8"/>    
+ </head> 
+<body>
+
+<div id='back' class='material-radio-button back'>
+ <input type='button'>
+ <label>
+  <div id='backb' tabindex='1' class='background ta'></div>
+  <div class='web1x-24dp web1x-arrow_back_24dp off'></div>
+ </label>           
+</div>
+
+<div id='tm' class='topmenu to shadow'>
+ <div class='logo container'>	
+   <div class='web1x-24dp web1x-pokeball'></div>
+   <span>Pokedex</span>
+ </div>	 	
+ <div class='material-radio-button container'>
+     <input id = 'filterp' type='button'>
+     <label for='filterp'>
+       <div id='flt' tabindex='2' class='background ta'></div>
+       <div class='web1x-24dp web1x-filter_24dp off'></div>
+     </label>           
+ </div>
+ <div class='material-radio-button container'>
+     <input id = 'sortp' type='button'>
+     <label for='sortp'>
+       <div id='sort' tabindex='1' class='background ta'></div>
+       <div class='web1x-24dp web1x-sort_24dp off'></div>
+     </label>           
+ </div>
+ <div id='filterbar' class='filterbar'><div class='chips'></div>
+  <div class='material-radio-button container' style='top: 0px'>
+     <input id = 'closef' type='button'>
+     <label for='closef'>
+       <div id='cfb' tabindex='3' class='background ta'></div>
+       <div class='web1x-24dp web1x-close_24dp off'></div>
+     </label>           
+  </div>  
+ </div> 
+</div>
+
+<div id='content' class='container slow-ta'><section id='pokedex' class='pokemons'></section>
+</div>
+<div id='wrapper' class='wrapper to'></div>
+<script type="text/javascript" src="lib/js/pokemons.js"></script>
+<script type="text/javascript" src="lib/js/waves.js"></script>
+</body>
+</html>	

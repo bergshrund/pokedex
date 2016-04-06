@@ -1,0 +1,755 @@
+<?
+$locale = "{$argv[1]}.{$argv[2]}";
+$domain = basename(__FILE__,".pjs");
+$directory = dirname(__FILE__).'/locale';
+putenv('LC_ALL='.$argv[1].'.'.$argv[2]);
+setlocale(LC_MESSAGES, $locale);
+bindtextdomain($domain, $directory);
+textdomain($domain);
+bind_textdomain_codeset($domain, $argv[2]);
+
+$rdir = preg_split('/_/',$argv[1]);
+?>
+function pokedex() { return this.construct(); }
+
+pokedex.prototype = { 
+ server: 'http://pokeapi.co/',
+ apiVersion: 1,
+ limit: 24,
+ cursor: 1,
+ inrow: 3, 
+ sorted: 'national_id',
+ filter: [], // [item1 || item2 || ... ] 
+ currentGroup: null,   
+ cardContainerStyle: 'column-2of6 column-1of2 column-1of1', 
+ generations: [151,251,386,493,649,721],  
+ 
+ topPadding: 64,
+ openedCard: false,
+ features: [{title:<? print _("\"Атака\"")?>,value:'attack'},
+            {title:<? print _("\"Защита\"")?>,value:'defense'},
+            {title:<? print _("\"Хиты\"")?>,value:'hp'},
+            {title:<? print _("\"Специальная атака\"")?>,value:'sp_atk'},
+            {title:<? print _("\"Специальная защита\"")?>,value:'sp_def'},
+            {title:<? print _("\"Скорость\"")?>,value:'speed'},
+            {title:<? print _("\"Вес\"")?>,value:'weight'},
+            {title:<? print _("\"Возможных движений\"")?>,value:'moves.length'}],
+ data: [],
+ types: [],
+ colors: [],   
+ 
+/**
+ *  Constructor method - build DOM and init events for pokedex 
+ *  External methods calls:
+ *  
+ *  sethandlers
+ *    
+ *  @this {pokedex} 
+ * 
+ *  @return {Object} Return new pokedex instance
+ */
+  
+ construct: function() {
+	var _this = this;
+	
+	this.getColors();
+	this.getTypes();
+		
+	this.pokedexContainer = byId('pokedex');			
+	Event.add(byId('content'),'scroll', function(event) { _this.getMore() });
+	Event.add(window,'resize', function(event) { _this.resize() });
+    
+    this.sortmenu = [{id:'sort',
+		              spec:{width: 3,
+		                    items: [{id: 'byindex',
+									  title:<? print _("\"По индексу\"")?>,
+					                  ap:"right",
+					                  align:"top",
+					                  class:"web1x-24dp web1x-radio_button_off_black_24dp",		                                      
+					                  events:[{event:{type:"build",body: function(p){																			         
+										         var item = p.mo.findNode('byindex');
+											     item.class = _this.sorted == 'national_id'?item.class +' web1x-radio_button_on_black_24dp':item.class.split(/web1x-radio_button_on_black_24dp/)[0]; 
+											   }}},
+					                          {event:{type:"click",body: function(){												  
+											      closePopup(this.mo.parent.popup,200); 
+												  _this.sorted = 'national_id';
+												  _this.sort(0);
+												  }}}]		                               
+		                             },
+		                             {id: 'byname',
+									 title:<? print _("\"По имени\"")?>,
+					                 ap:"right",
+					                 align:"top",
+					                 class:"web1x-24dp web1x-radio_button_off_black_24dp",
+					                 events:[{event:{type:"build",body: function(p){																			         
+										         var item = p.mo.findNode('byname');
+											     item.class = _this.sorted == 'name'?item.class +' web1x-radio_button_on_black_24dp':item.class.split(/web1x-radio_button_on_black_24dp/)[0]; 
+											   }}},
+											 {event:{type:"click",body: function(){												  
+												  closePopup(this.mo.parent.popup,200);											      
+											      _this.sorted = 'name'; 
+												  _this.sort(0);												  
+												  }}
+										      }]},
+		                             
+		                             {id: 'bycolor',
+									  title:<? print _("\"По цвету\"")?>,
+					                  ap:"right",
+					                  align:"top",
+					                  class:"web1x-24dp web1x-radio_button_off_black_24dp",		                                      
+					                  events:[{event:{type:"build",body: function(p){																			         
+										         var item = p.mo.findNode('bycolor');
+											     item.class = _this.sorted == 'color'?item.class +' web1x-radio_button_on_black_24dp':item.class.split(/web1x-radio_button_on_black_24dp/)[0]; 
+											   }}},
+					                          {event:{type:"click",body: function(){												  
+											      closePopup(this.mo.parent.popup,200); 
+												  _this.sorted = 'color';
+												  _this.sort(0);
+												  }}}]		                               
+		                             }]
+		                      
+		                      }
+		                }];
+	
+	this.filtermenu = [{id:'filter',
+		              spec:{width: 2,
+		                    items: [{id: 'bytypes',
+									 title:<? print _("\"Типы\"")?>,
+					                 ap:"right",
+					                 align:"top",					                 
+					                 events:[{event:{type:"build",body: function(p){
+										 										   										 
+										   if(_this.types.length == 0 || !_this.freeTypes()) {
+										     var item = p.mo.findNode('bytypes');
+										     item.disabled = true;
+										     }
+										 
+										 }}},
+											 {event:{type:"click",body: function(){
+												  closePopup(this.mo.parent.popup,200);
+												  _this.selectTypes();
+												  }}
+										      }]},
+		                             {id: 'byfavorits',
+									  title:<? print _("\"Любимые\"")?>,
+									  disabled: true,
+					                  ap:"right",
+					                  align:"top",					                  
+					                  events:[{event:{type:"build",body: function(p){}}},
+					                          {event:{type:"click",body: function(){
+												  closePopup(this.mo.parent.popup,200);												  									 
+												  }}}]		                               
+		                             }]
+		                      
+		                      }
+		                }];
+		                
+		                
+		                   	
+	var handlers = [{id:'sort',type:'click',                      
+                     body:function (event){ 
+						fixup(event);
+						var menu = new Menu(this);
+		                this.mo = menu;
+		                if(!menu) return false;		   		  
+		                menu.build(_this.sortmenu[0].spec) && menu.show('right-bottom-down');							 						 					
+				       }},
+				    {id:'flt',type:'click',                      
+                      body:function (event){ 
+						fixup(event);
+						var menu = new Menu(this);
+		                this.mo = menu;
+		                if(!menu) return false;		   		  
+		                menu.build(_this.filtermenu[0].spec) && menu.show('right-bottom-down');							 						 					
+				       }},
+				     {id:'cfb',type:'click',                      
+                      body:function (event){ 
+						fixup(event);
+						_this.filterRemove({value:false});						
+				       }}  				       
+				    ];
+	
+	sethandlers(handlers);							 
+	return this;
+ },
+
+
+/**
+ * Load pokemon types from pokeapi.co 
+ * 
+ * Call getResource with resource 'type' 
+ *
+ * @this {pokedex}
+ * 
+ * $return {nothing}
+ */
+ 
+ getTypes: function() {	
+	this.getResource(this.server+'api/v'+this.apiVersion+'/type/?callback=parsetypes&limit=100','types',function(result) {		
+		try{result.objects.length} catch (e) { return false; }
+		return true;		
+		});
+			 	 	 
+  },
+ 
+ freeTypes: function() {	
+	try {this.types.objects} catch(e) { return false };			
+	for(var t = 0; t < this.types.objects.length; t++)	 
+	     if (this.filter.indexOf(this.types.objects[t].name.toLowerCase()) == -1) break;	
+	return t < this.types.objects.length;	 
+  },	 
+
+/**
+ * Load pokemon colors
+ *
+ * Call getResource with resource 'colors' 
+ * 
+ * We can't load color groups from pokeapi.co by API version 1 and we can't use JSONP with version 2 yet. 
+ * So temporary load static colors data in v2 format from local site. This behavour will be changed as soon as
+ * pokeapi introduce JSONP support for API version 2. 
+ * 
+ * @this {pokedex}
+ * 
+ * $return {nothing}
+ */ 
+  
+ getColors: function() {
+	this.getResource('http://pokemons.data-1.net/en/colors.json','colors',function(result) {
+		try {result[0].pokemon_species.length} catch(e) { return false }
+		return true;		
+		});	 	 	 
+  }, 	 
+ 
+ getResource: function(url,resource,checkResult) {
+	if(this.mutex == resource) return; 	
+	this.mutex = resource;  
+		
+	var _this = this;
+	var request = new transcontrol(); 
+	var rObj = request.rObj;	
+	rObj.url = url;
+	
+	request.showOkTimeout = 0;
+    request.sendingTimeout = 1000;
+    request.responseTimeout = 4000;    
+    request.transitionTimeout = 1000;
+    request.showSnackTimeout = 5000;
+	request.snackProgress = true;
+	request.progressContainer = 'stub';	
+	request.showErrTimeout = 0;	 
+	
+	request.tryagainHandler = function() {
+	
+	   _this.mutex = false;	
+	   _this.getResource(url,resource,checkResult);
+		
+	 }
+					
+	request.trIn = [{},{},{},{},{snackText: 'Load '+ resource},{snackText: 'Loading ' + resource + ' timeout',snackAction:{text:'RETRY',handler:request.tryagainHandler}}];
+	request.trOut = [];
+	
+	rObj.parserName = 'parse' + resource; 
+	rObj.parserBody = function(result) {								
+	   	rObj.clearprogress(rObj);
+	   	if(!checkResult(result)) result.retcode = 1;
+	    rObj.callback && rObj.callback(result);					  
+	  };
+	
+	request.callbackOk = function(result) {		  				 														
+      _this[resource] = result;	
+      	
+	 };
+	
+		
+	
+	request.afterAll = function(){
+		 if(this.mutex == resource) _this.mutex = false;
+	   };  
+            
+	request.start(); 
+
+  },	 
+ 
+/**
+ * Search pokemons color 
+ * 
+ * @param {String} pokemon name
+ * 
+ * @this {pokedex}
+ * 
+ * @return color name on success or 0
+ */
+   
+ getColorByName: function(name) {	
+	for (n=0;n<this.colors.length;n++)
+	  for(p=0;p<this.colors[n].pokemon_species.length;p++)
+	    if(this.colors[n].pokemon_species[p].name == name.toLowerCase())
+	      return this.colors[n].name;
+	return 0;      
+  },	 
+ 
+ getTypeNameById: function(id) {
+    for (n=0;n<this.types.objects.length;n++)	 
+	  if(this.types.objects[n].id == id)
+	    return this.types.objects[n].name;	
+	return null;	   
+  },	 
+ 
+ colorize: function(objs) {	
+	for(var n=0; n < objs.length; n++)
+	  objs[n].color = this.getColorByName(objs[n].name);	 
+  },	 
+ 
+ get: function() {
+	
+	if(this.mutex == 'getIndex') return; 	
+	this.mutex = 'getIndex';
+			
+	var _this = this;		
+	var request = new transcontrol(this.pokedexContainer); 
+	
+	var rObj = request.rObj;	
+	rObj.url = this.server+'api/v'+this.apiVersion+'/pokemon/?callback=parseResponse&limit='+this.limit+'&offset='+(this.cursor-1);			
+	        
+    request.showOkTimeout = 0;
+    request.sendingTimeout = 1000;
+    request.responseTimeout = 18000;    
+    request.progresser = 'progresser';
+    request.transitionTimeout = 0;
+    request.snackOnError = false;
+	request.snackOnTimeout = false;
+	request.showErrTimeout = 0;	 
+	request.progressContainer = this.pokedexContainer;
+		  
+	request.trIn = [];
+	request.trOut = [];   
+	
+	rObj.parserBody = function(result) {								
+	   	rObj.clearprogress(rObj);
+	   	try {result.objects.length} catch(e) { result.retcode = 1; }	   		 	    	 	    	   
+	    rObj.callback && rObj.callback(result);					  
+	  }	
+	
+	request.callbackOk = function(result) {
+	
+	  _this.inrow = window.innerWidth > 960?3:2;
+	  
+	  _this.colorize(result.objects);
+		  				 														
+      _this.data = _this.data.slice().concat(result.objects.slice());					
+	  if(_this.sorted !== null || _this.filter.length > 0)
+		_this.sort();				                              	      
+      else	// api v2 return sorted list by default 	
+		_this.build(_this.cursor - 1 + _this.limit > _this.data.length?
+		            _this.data.length-_this.cursor+1:_this.limit);		
+		  
+		};
+	
+	request.callbackErr = function() {		  
+		  if (_this.mutex == 'getIndex') _this.mutex = false;
+		};   
+      
+    request.tryagainHandler = function(){
+		 
+	   };
+    
+    request.afterAll = function(){
+		 if (_this.mutex == 'getIndex') _this.mutex = false;
+	   };  
+      
+      
+	request.start();
+						  	 	 	
+  },
+ 
+ rebuild: function(count) {	
+	this.currentGroup = null;	
+	this.pokedexContainer.innerHTML = '';	
+	this.cursor = 1;	 
+	this.build(count);
+  },	 
+   	   
+ build: function(count) {		
+	var ep = this.cursor + count;
+	
+	while(this.cursor < ep)
+	  this.pokedexContainer.appendChild(this.buildRow(this.cursor));
+		
+	Waves.attach('.material-card',['waves-classic']);
+  },
+    
+ buildRow: function(first) {	
+	var inrow = first + this.inrow <= this.data.length?this.inrow:this.data.length-first+1;	 
+	var fragment = document.createDocumentFragment();
+	var rowContainer = document.createElement('div');
+	rowContainer.className = 'container';
+	rowContainer.innerHTML = "<div class='columns'></div>";	
+	for(var n=0;n<inrow;n++) {	 				 		
+	 var g = this.sorted && this.data[first-1+n][this.sorted]?this.getGroupIndex(this.data[first-1+n][this.sorted]):null;	
+	 
+	 var card = this.buildCard(first+n);
+	 
+	 // If card has been filtered	 
+	 if(card === false) { 
+	  this.cursor++;		 
+      n--;
+      first++;
+      var inrow = first + this.inrow <= this.data.length?this.inrow:this.data.length-first+1;
+      continue;
+      }
+		 	 	 	 	
+	 if(g != null && this.currentGroup != null && g != this.currentGroup) {		    	 		
+	   this.currentGroup = g;	   	   	   	   
+	   fragment.appendChild(rowContainer);
+	   fragment.appendChild(this.buildGroupTitle());
+	   return fragment;	   	   	   	   	   	 	   
+       }
+	
+	 if(this.sorted && this.currentGroup == null)	   	   
+	   g && fragment.appendChild(this.buildGroupTitle(g));	   
+      	   	 
+	 this.currentGroup = g;	 
+	 		
+	 rowContainer.firstChild.appendChild(card);
+     this.cursor++;	 
+    }   
+                     
+    fragment.appendChild(rowContainer);  
+    return fragment;
+  },	 
+    
+ buildCard: function(id) {
+
+   var filtered = this.filter.length?true:false;
+   	 
+   var pokedexObj = this;
+   var types = '';
+   var eggroops = '';
+   var container = document.createElement('div');
+   container.className = this.cardContainerStyle;
+     
+   var cardData = this.data[id-1];
+
+   var card = document.createElement('div');
+   card.className = 'material-card';
+   card.id = cardData.national_id;  	 	 
+   card.dataIndex = id;
+	 
+   for (z = 0; z<cardData.egg_groups.length;z++)
+	 eggroops += (z>0?'-':'')+cardData.egg_groups[z].name;
+	 
+   for (var z = 0; z<cardData.types.length;z++) {	   
+	 if(filtered && this.filter.indexOf(cardData.types[z].name.toLowerCase()) > -1) filtered = false;	     	     	  
+	 types += '<span style="padding: 0px 3px">'+cardData.types[z].name+'</span>';            
+     }
+   
+   if(filtered) return false;	   
+	 
+   card.innerHTML = "<div class='material-card-info to'>\
+   <div class='card-title'><div><div>"+cardData.name+"</div>\
+   <div class='sub'>"+eggroops+"</div></div></div>\
+   <div class='card-subtitle'><? print _("Тип:")?> "+types+"</div>\
+   <div class='material-radio-button button-container'>\
+   <input id='cb"+card.id+"' type='checkbox'>\
+   <label for='cb"+card.id+"'>\
+   <div id='f"+card.id+"' tabindex='"+card.id+"' class='background ta'></div>\
+   <div class='web1x-24dp web1x-star_outline_24dp off'></div>\
+   <div class='web1x-24dp web1x-star_24dp on'>\
+   </div></label>\
+   </div></div>\
+   <div class='material-card-media ta'><div class='background'></div>\
+   </div>";	 	 	 	   	  
+      
+   loadImage(card.lastChild,this.server+'media/img/'+cardData.national_id+'.png');
+	 
+   Event.add(byId('f'+card.id,card),'click',function(event) { fixup(event); var cb=byId('cb'+card.id); cb.checked = cb.checked?false:true; });	 
+   Event.add(card,'click',function(event) { var _this = this; 
+                                            if(!pokedexObj.openedCard) 
+                                               {
+												 pokedexObj.openedCard = true;
+                                                 setTimeout(function(event){pokedexObj.openCard(_this.id)},300);
+                                               }});
+	 
+   container.appendChild(card);
+   return container;
+  },
+ 
+ filterAdd: function(value) {
+	this.showFilterBar(true);	
+    var fv = this.getTypeNameById(value).toLowerCase();
+	this.filter[this.filter.length] = fv;		 
+	byId('filterbar').firstChild.appendChild((new chip(this,fv)).add(this.filterRemove));
+    this.rebuild(this.cursor - 1);    								 						 								
+    this.adjustTopMenu();
+   },	 
+ 
+ filterRemove: function(chip) {		 
+	if(chip.value === false) {
+	  this.filter = [];  
+	  byId('filterbar').firstChild.innerHTML = '';    
+	 }
+	else { 		
+	 var p = this.filter.indexOf(chip.value);
+	 if(p > -1) this.filter.splice(p,1);
+	 chip.c.parentNode.removeChild(chip.c);
+	 delete chip;
+     }
+	
+	if(this.filter.length == 0 || chip.value === false) 
+	   this.showFilterBar(false);  
+	
+	this.rebuild(this.cursor - 1);	
+	this.adjustTopMenu();
+   },	 
+   	 
+ sort: function(limit) {			 
+	(new Sort(this.data)).sort(this.sorted);                          			
+	this.rebuild(this.cursor + (limit !== undefined?limit:this.limit) - 1);
+  },
+ 
+ getGeneration: function(value) {	
+	for(var g=0;g<this.generations.length;g++)
+	  if(value < this.generations[g]) 	    
+	    break;	    	    			
+	return <? print _("\"Поколение \"")?> + (++g);
+  },	 
+ 
+ getGroupIndex: function(value) {	 
+	switch(this.sorted) {		
+	  case 'color': 
+		return value;
+	  case 'name':
+		return value.toString()[0].toUpperCase();   
+	  case 'national_id':
+		return this.getGeneration(value); 		 
+	 }
+  },
+  
+ buildGroupTitle: function(value) {
+	var rowContainer = document.createElement('div');
+	rowContainer.className = 'container';
+	rowContainer.innerHTML = "<div class='columns subheader'>"+(value?value:this.currentGroup)+"</div>";
+	return rowContainer;  	 
+  },
+ 
+ getMore: function() {		
+	var st = byId('content').scrollTop;
+	var wh = window.innerHeight;	
+	var h = this.pokedexContainer.clientHeight;
+	 	 
+	if (st + wh - this.topPadding == h)
+	  this.get();     
+  },
+ 
+ adjustTopMenu: function() {
+	document.body.style.paddingTop = byId('tm').clientHeight;
+  },	 
+  
+ resize: function() {		
+	closeAllPopup();
+	this.adjustTopMenu();
+	 	 
+	var old = this.inrow;
+	this.inrow = window.innerWidth > 960?3:2;		
+	if(this.inrow == old) return;
+						
+	this.rebuild(this.cursor < this.limit?this.limit:this.cursor-1);		
+  },
+  
+ openCard: function(id) {   
+    var _this = this;
+    
+    var c = byId(id);
+    try { c.id && 1 } catch(e) {return};
+                       
+    var xy = getXY(c);    
+    var w = c.clientWidth;
+    
+    // Hide pokedex
+    byId('content').style.display='none';
+    byId('tm').style.display='none'; 
+    
+    addClass('hide',byId('content'));
+    addClass('hide',byId('tm'));
+       
+    document.body.style.overflowY='scroll';
+    
+    // Clone card                  
+    var t = document.createElement('div');
+    t.id = 'card' + id;
+    t.className = 'material-card slow-ta clone';
+    t.innerHTML = c.innerHTML;
+    t.style.left = xy.left;    
+    t.style.top = xy.top;         
+    t.style.width = _getElementsByClassName(t,'material-card-media')[0].style.width = w;    
+    
+    addClass('hide',t.firstChild);        
+               
+    // Build pokemon's data table
+    t.appendChild(_this.buildTable(c.dataIndex));
+    
+    // Build float button    
+    var fb = new floatButton('favorit',t.firstChild);
+	fb.iconClassName = 'web1x-24dp web1x-star_outline_24dp';	
+	fb.className = 'material-fb-container ta fb-hidden';	 	 
+	fb.build('bgcolor-accent material-centered').attach('floatbutton-position');
+            
+    document.body.appendChild(t);
+               
+    // Add 'back' control    
+    var back = byId('back');
+    back.style.display='block';    
+    Event.removeall(back,'click');
+    Event.add(back,'click',function(event){ _this.closeCard(t.id); _this.openedCard = false;});
+            
+    // Start transition                      
+    setTimeout(function(){	
+	  	
+	  removeClass('hide',t.firstChild);
+	  removeClass('hide',t.lastChild);	 	  	  		      
+      addClass('opened',t);                         
+                      
+      setTimeout(function(){         
+         fb.show('fb-hidden');
+	    },300);
+                                                                                  
+     },50);  
+     
+   },
+  
+ closeCard: function(id) {	
+	var t = byId(id);		
+	removeClass('opened',t);
+    back.style.display='none';
+    document.body.style.overflowY='hidden';
+	byId('content').style.display='block';
+    byId('tm').style.display='block';
+    
+    setTimeout(function() {		
+		removeClass('hide',byId('content'));
+		removeClass('hide',byId('tm'));				
+		},50);
+                
+	t.parentNode.removeChild(t);			 
+	this.adjustTopMenu();
+   },
+     	      
+ buildTable: function(id) {	
+	  var t = document.createElement('div');
+	  t.className = 'material-table slow-to hide';
+	  	  
+	  for (var r=0;r<this.features.length;r++) {
+	    row = document.createElement('div');
+	    row.className = 'material-table-row';
+	    try {var v = eval('this.data[id-1].' +this.features[r].value)} catch(e) {var v = '-'}
+	    row.innerHTML = "<div class='cell-type'>"+this.features[r].title+"</div><div class='cell-value'>"+v+"</div>";
+	    t.appendChild(row); 	    
+	   } 
+	      
+	  return t;	 
+   },
+  
+  showFilterBar: function(show) {
+	  	  
+	  document.body.style.paddingTop = this.topPadding = show?112:64;
+	  
+	  if(show) {
+		addClass('higtlight',byId('flt'));
+		byId('filterbar').style.display = 'block';
+	    return true;
+	   }
+	  
+	  // esle close
+	  removeClass('higtlight',byId('flt'));
+	  byId('filterbar').style.display = 'none';
+	  	  	  
+   },	  
+  
+  selectTypes: function() {
+	
+	var w = byId('wrapper');		
+	try { w.id } catch(e) { return false }
+				
+    var wo = document.createElement('div');
+    wo.id = 'typesmd';
+    wo.className = 'modal material-dialog';
+    wo.appendChild(this.buildDialog());
+        
+    var popupData = {id:'ptypesmd', class: 'wrapped'};	            
+    var _popup = initPopup(popupData);	    
+    _popup.noclose = true; // modal popup
+    
+    this.closeDialog = function() {
+		removeClass('show',w) && setTimeout(function() { removeClass('display',w); closePopup(_popup); },200);
+	  };
+                      
+    openPopup(_popup,event,w,{div:wo},'ptypesmd');
+    addClass('shadow',_popup.popupObj);
+    try {  Waves.attach('.mdmitemhl',['waves-classic']);} catch(e) {}
+        	              		 
+   },
+  
+  buildDialog: function() {	  	 
+	 var _this = this; 
+	 var fragment = document.createDocumentFragment();
+	 
+	 var h = document.createElement('div');
+	 h.className = 'header';
+	 h.innerHTML = '<p><? print _("Тип покемона") ?></p>';
+	 	 
+	 var l = document.createElement('div');
+	 l.className = 'content';	
+	 l.appendChild(this.getTypeList());
+	 	
+	 var f = document.createElement('div');
+	 f.className = 'bottom-area';
+	 f.innerHTML = "<div class='material-flat-button' id='savetype'><span class='text'><? print _("OK") ?></span>\
+	 <div tabindex='1' class='background ta'></div></div><input type='hidden' name='savetype'>\
+	 <div class='material-flat-button' id='canceltype'><span class='text'><? print _("ОТМЕНА") ?></span>\
+	 <div tabindex='2' class='background ta'></div></div><input type='hidden' name='canceltype'></div>";
+	 
+	 Event.add(byId('savetype',f),'click',function(event){ fixup(event);	 	   	
+	   try { var type = document.querySelector('input[name=type]:checked').value } catch(e) { return false }	   		   
+	   _this.closeDialog(); 
+	   _this.filterAdd(type);	      
+	   });
+	   
+	 Event.add(byId('canceltype',f),'click',function(event){ fixup(event); _this.closeDialog(); });
+	 
+	 fragment.appendChild(h);
+	 fragment.appendChild(l);
+	 fragment.appendChild(f); 
+	  
+	 return fragment;
+    },
+   
+   buildTypesSpec: function() {	 
+	 var spec = {width: 3,items: []};
+	 for(var t = 0; t < this.types.objects.length; t++) {
+	 
+	     if (this.filter.indexOf(this.types.objects[t].name.toLowerCase()) > -1) continue;
+	     
+	     spec.items[spec.items.length] = {id:this.types.objects[t].id, 
+	                                      title:this.types.objects[t].name,
+					                      ap:"right",align:"top",
+					                      radio:'type',
+					                      events:[{event:{type:"click",body: function(event){ fixup(event); 
+					                      byId('radio' + this.id).checked = true; }}}]};	    	
+         }					                      
+					                      
+	 return spec; 	   
+	},   
+       
+   getTypeList: function(container) {	  	  
+	  var menu = new Menu(this);
+	  menu.multiper = 56; // By default dialogs unit 56px
+	  menu.build(this.buildTypesSpec());	  	  	  	  	  
+	  return menu.container; 
+	}
+                   	
+};
+
+Event.add(window,'DOMContentLoaded',function() {	
+	Waves.init();
+    (new pokedex()).get();                     
+  });

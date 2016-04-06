@@ -1,0 +1,25 @@
+
+/set type=file uname=pokemon gname=www mode=0644
+.               type=dir mode=0755
+    colors.json
+    pokemons.css
+    roboto.css 
+    waves.min.css
+
+img             type=dir mode=0755
+    web1x_24dp.css
+    web1x_24dp.png
+..
+
+
+/set type=file uname=pokemon gname=www mode=0755
+lib             type=dir
+
+/set type=file uname=pokemon gname=www mode=0644
+js              type=dir mode=0755
+..
+
+..
+
+..
+

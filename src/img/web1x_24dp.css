@@ -1,0 +1,95 @@
+.web1x {
+    background-image: url(spritesheet.png);
+    background-repeat: no-repeat;
+    display: block;
+}
+
+.web1x-arrow_back_24dp {
+    width: 24px;
+    height: 24px;
+    background-position: -20px -20px;
+}
+
+.web1x-arrow_back_white_24dp {
+    width: 24px;
+    height: 24px;
+    background-position: -84px -20px;
+}
+
+.web1x-checkbox_24dp {
+    width: 24px;
+    height: 24px;
+    background-position: -148px -20px;
+}
+
+.web1x-checkbox_outline_24dp {
+    width: 24px;
+    height: 24px;
+    background-position: -20px -84px;
+}
+
+.web1x-close_24dp {
+    width: 24px;
+    height: 24px;
+    background-position: -84px -84px;
+}
+
+.web1x-close_circle_24dp {
+    width: 24px;
+    height: 24px;
+    background-position: -148px -84px;
+}
+
+.web1x-filter_24dp {
+    width: 24px;
+    height: 24px;
+    background-position: -20px -148px;
+}
+
+.web1x-filter_white_24dp {
+    width: 24px;
+    height: 24px;
+    background-position: -84px -148px;
+}
+
+.web1x-pokeball {
+    width: 24px;
+    height: 24px;
+    background-position: -148px -148px;
+}
+
+.web1x-radio_button_off_black_24dp {
+    width: 24px;
+    height: 24px;
+    background-position: -212px -20px;
+}
+
+.web1x-radio_button_on_black_24dp {
+    width: 24px;
+    height: 24px;
+    background-position: -212px -84px;
+}
+
+.web1x-sort_24dp {
+    width: 24px;
+    height: 24px;
+    background-position: -212px -148px;
+}
+
+.web1x-sort_white_24dp {
+    width: 24px;
+    height: 24px;
+    background-position: -20px -212px;
+}
+
+.web1x-star_24dp {
+    width: 24px;
+    height: 24px;
+    background-position: -84px -212px;
+}
+
+.web1x-star_outline_24dp {
+    width: 24px;
+    height: 24px;
+    background-position: -148px -212px;
+}
