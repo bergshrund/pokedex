@@ -12,7 +12,7 @@ The following programs and/or packages are required:
 * NGINX HTTP server, version 1.0.14 or later
 * GNU Make version 3.82 or later
 * GNU Gettext version 0.18.1 or later
-* php version 5.3 or later
+* php CLI version 5.3 or later for gettext preprocessing
 
 ## Supported Browsers:
 Chrome 49+, Firefox 45.0.1+, Opera 12.17+
@@ -75,7 +75,7 @@ than "/var/projects/pokemons/www" by typing your preferable value into INSTALLDI
         error_page   403              /403.html;
         error_page   404              /404.html;
         error_page   500 502 503 504  /50x.html;
-   }
+       }
 
 
 
