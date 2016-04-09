@@ -9,10 +9,10 @@ See a working version on [http://pokemons.data-1.net](http://pokemons.data-1.net
 
 The following programs and/or packages are required: 
 
-NGINX HTTP server, version 1.0.14 or later
-GNU Make version 3.82 or later
-GNU Gettext version 0.18.1 or later
-php version 5.3 or later
+* NGINX HTTP server, version 1.0.14 or later
+* GNU Make version 3.82 or later
+* GNU Gettext version 0.18.1 or later
+* php version 5.3 or later
 
 ## Supported Browsers:
 Chrome 49+, Firefox 45.0.1+, Opera 12.17+
@@ -25,8 +25,8 @@ than "/var/projects/pokemons/trunk" by changing variable MASTERDIR in Makefile t
 
 In the directory that the Makefile is in, type "./gmake" to build the site:
 
-$ cd pokedex
-$ ./gmake; gmake reinstall
+     $ cd pokedex
+     $ ./gmake; gmake reinstall
 
 ### Make file setup
 By default, gmake will install source files in "/var/projects/pokemons/www". You can specify a directory name other 
