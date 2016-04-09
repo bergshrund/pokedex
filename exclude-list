@@ -3,12 +3,15 @@
 *.pjs
 *_en.html
 *_en.js
+*_en.cjs
 *_en.css
 *_ru.html
 *_ru.js
+*_ru.cjs
 *_ru.css
 *_uk.html
 *_uk.js
+*_uk.cjs
 *_uk.css
 locale
 Makefile
