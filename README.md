@@ -3,7 +3,7 @@
 Simple pokeapi.io client.
 See a working version on [http://pokemons.data-1.net](http://pokemons.data-1.net)
 
-### Current Version : v0.0.1a
+### Current Version : v0.0.2a
 
 ## Prerequisites and other notes
 
@@ -13,6 +13,9 @@ The following programs and/or packages are required:
 * GNU Make version 3.82 or later
 * GNU Gettext version 0.18.1 or later
 * php CLI version 5.3 or later for gettext preprocessing
+* php-gettext extention module
+
+Pokedex uses [Waves.js](https://github.com/fians/Waves) external library that has been slightly modified and included to allow us to create the ink effect.
 
 ## Supported Browsers:
 Chrome 49+, Firefox 45.0.1+, Opera 12.17+
