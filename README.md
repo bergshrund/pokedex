@@ -15,6 +15,8 @@ The following programs and/or packages are required:
 * php CLI version 5.3 or later for gettext preprocessing
 * php-gettext extention module
 
+Pokedex uses [Waves.js](https://github.com/fians/Waves) external library that has been slightly modified and included to allow us to create the ink effect.
+
 ## Supported Browsers:
 Chrome 49+, Firefox 45.0.1+, Opera 12.17+
 
