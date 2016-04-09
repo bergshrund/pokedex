@@ -91,22 +91,15 @@ requestAPI.prototype = {
    }, 
  
  	   
- send: function(doit) {
-	
-	var _this = this; 	 
-		
-	window[this.parserName] = this.parserBody;
-			
-	this.showprogress(doit?doit:null);	
-	
+ send: function(doit) {	
+	var _this = this; 	 		
+	window[this.parserName] = this.parserBody;			
+	this.showprogress(doit?doit:null);		
 	var script = document.createElement('script')
 	script.id = this.rid;
 	script.src = this.url;
 	script.type = 'application/javascript';
-	document.body.appendChild(script);                                         									 
-	
-	console.log('start load script');
-	
+	document.body.appendChild(script);			
 	return true; 				   
   }
  

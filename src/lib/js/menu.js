@@ -69,7 +69,13 @@ build: function(spec,current) {
 			  _this.parent.value = this.id;
 			  
 			  setTimeout(function(){
-			  var _popup = _this.parent.popup; _popup && _popup.hide() && _popup.destroy() && delete _popup;			
+		       
+		       		  
+				  
+			  //var _popup = _this.parent.popup; _popup && _popup.hide() && _popup.destroy() && delete _popup;			
+			  
+			  closePopup(_this.parent.popup);
+			  
 			  if(_this.handler) _this.handler(_this.parent.id,_this.parent.value);			
 		      },200);
 			  
@@ -179,11 +185,12 @@ show: function(showClass,popupId) {
      _popup.marginY = -this.itemHeight * mY;
     
      this.parent.popup = _popup;
-	 openPopup(_popup,event,this.parent,{div:this.container},popupData.id);
+	 openPopup(_popup,null,this.parent,{div:this.container},popupData.id);
 	 
 	 
 	 Event.add(this.container,'focus',function(event){this.style.backgroundColor ='#dddddd';});	 
-	 Event.add(this.container,'blur',function(event){_popup && _popup.hide() && _popup.destroy() && delete _popup;});
+	 //Event.add(this.container,'blur',function(event){_popup && _popup.hide() && _popup.destroy() && delete _popup;});
+	 Event.add(this.container,'blur',function(event){closePopup(_popup)});
 	 	 	 
 	 this.container.scrollTop = sT * this.itemHeight;	 
 	 this.container.focus();
@@ -204,7 +211,7 @@ show: function(showClass,popupId) {
       popupData.class = showClass;
                             		  		  		 
     var _popup = initPopup(popupData);	            	      	   	      	                                                  	          	          	 
-    openPopup(_popup,event,this.parent,{div:this.container},popupData.id);
+    openPopup(_popup,null,this.parent,{div:this.container},popupData.id);
         
     this.parent.popup = _popup;
     _popup.popupObj && addClass('menu-popup',_popup.popupObj) && this.height && this.container.childNodes.length > this.height && addClass('stricted-popup',_popup.popupObj);    

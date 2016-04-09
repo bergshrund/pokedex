@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: POKEMONS 0.1b\n"
 "Report-Msgid-Bugs-To: bergsrund@gmail.com\n"
-"POT-Creation-Date: 2016-04-05 18:25+0300\n"
+"POT-Creation-Date: 2016-04-09 12:53+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,74 +17,78 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: pokemons.pjs:29
+#: pokemons.pjs:34
 msgid "\"Атака\""
 msgstr ""
 
-#: pokemons.pjs:30
+#: pokemons.pjs:35
 msgid "\"Защита\""
 msgstr ""
 
-#: pokemons.pjs:31
+#: pokemons.pjs:36
 msgid "\"Хиты\""
 msgstr ""
 
-#: pokemons.pjs:32
+#: pokemons.pjs:37
 msgid "\"Специальная атака\""
 msgstr ""
 
-#: pokemons.pjs:33
+#: pokemons.pjs:38
 msgid "\"Специальная защита\""
 msgstr ""
 
-#: pokemons.pjs:34
+#: pokemons.pjs:39
 msgid "\"Скорость\""
 msgstr ""
 
-#: pokemons.pjs:35
+#: pokemons.pjs:40
 msgid "\"Вес\""
 msgstr ""
 
-#: pokemons.pjs:36
+#: pokemons.pjs:41
 msgid "\"Возможных движений\""
 msgstr ""
 
-#: pokemons.pjs:65
+#: pokemons.pjs:70
 msgid "\"По индексу\""
 msgstr ""
 
-#: pokemons.pjs:80
+#: pokemons.pjs:85
 msgid "\"По имени\""
 msgstr ""
 
-#: pokemons.pjs:96
+#: pokemons.pjs:101
 msgid "\"По цвету\""
 msgstr ""
 
-#: pokemons.pjs:117
+#: pokemons.pjs:122
 msgid "\"Типы\""
 msgstr ""
 
-#: pokemons.pjs:134
+#: pokemons.pjs:139
 msgid "\"Любимые\""
 msgstr ""
 
-#: pokemons.pjs:451
+#: pokemons.pjs:322
+msgid "\"Таймаут соединения\""
+msgstr ""
+
+#: pokemons.pjs:469
 msgid "Тип:"
 msgstr ""
 
-#: pokemons.pjs:514
+#: pokemons.pjs:532
 msgid "\"Поколение \""
 msgstr ""
 
-#: pokemons.pjs:698
+#: pokemons.pjs:721
 msgid "Тип покемона"
 msgstr ""
 
-#: pokemons.pjs:706
+#: pokemons.pjs:729
 msgid "OK"
 msgstr ""
 
-#: pokemons.pjs:708
+#: pokemons.pjs:731
 msgid "ОТМЕНА"
 msgstr ""

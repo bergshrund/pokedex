@@ -36,7 +36,7 @@ function initPopup(popupData) {
 	_popup.style = popupData.decoration?popupData.decoration:null;	    		   
     _popup.offsetX = popupData.offsetX?popupData.offsetX:0;
     _popup.offsetY = popupData.offsetY?popupData.offsetY:0;
-    _popup.class = popupData.class?popupData.class:'left-bottom-down';                	
+    _popup.styleclass = popupData.class?popupData.class:'left-bottom-down';                	
 	return _popup;
   }
   	 	
@@ -52,7 +52,8 @@ function openPopup(_popup,event,attachedTo,contentObj,popupID) {
 	     return _popup;	    
 	    }
 	  else {             
-			if(attachedTo.popup) attachedTo.popup.hide() && attachedTo.popup.destroy() && delete attachedTo.popup;
+			//if(attachedTo.popup) attachedTo.popup.hide() && attachedTo.popup.destroy() && delete attachedTo.popup;
+			if(attachedTo.popup) closePopup(attachedTo.popup);
 			return true;
 		   }	 	 	
    }
@@ -71,7 +72,7 @@ popup.prototype = {
 	attachObj: null, // DOM - об’єкт до якого буде прикріплено popup	
 	style: null,
 		
-	class: 'right-bottom-down',
+	styleclass: 'right-bottom-down',
 					
 	offsetX: 0,
 	offsetY: 0,
@@ -94,9 +95,9 @@ construct: function(popupID) {
   },	
 
 popupInit: function(id,eventer){
-	var c = {X:null,Y:null}; 		    			  	  	    		     		     		
+	var coor = {X:null,Y:null}; 		    			  	  	    		     		     		
     if(this.attachObj == null || eventer.id != this.attachObj.id)            	  	  		          
-      this.build(id) && this.attach(eventer,c) && this.show(c);           	 
+      this.build(id) && this.attach(eventer,coor) && this.show(coor);
   },
 
 build: function(popupID) {
@@ -108,7 +109,7 @@ build: function(popupID) {
 	  this.popupObj.appendChild(this.content);
 
     // INSERT POPUP TO DOM HERE 	  	  	  
-    if(this.class != 'wrapped')
+    if(this.styleclass != 'wrapped')
 	  document.body.appendChild(this.popupObj);
 		  
 	return true;
@@ -133,7 +134,7 @@ attach: function(attachtoObj,c) {
     
     var content = this.popupObj.firstChild;
     
-    switch(this.class) {
+    switch(this.styleclass) {
 	 
 	 case 'right-bottom-down':
 	      var X = ac.left + this.attachObj.clientWidth + this.offsetX;
@@ -169,7 +170,7 @@ show: function(c) {
 	
 	this.popupObj.style.zIndex=this.zIndex;
 							
-	if(this.class == 'wrapped') {
+	if(this.styleclass == 'wrapped') {
 	   var w = byId('wrapper');
 	   w.appendChild(this.popupObj);		   
 	   addClass('display',w);
@@ -227,3 +228,14 @@ addCloseEvent: function() {
  }
  
 };
+
+window['closeAllPopup'] = closeAllPopup;
+window['closePopup'] = closePopup;
+window['initPopup'] = initPopup;
+window['openPopup'] = openPopup;
+
+window['popup'] = popup;
+popup.prototype['popupInit'] = popup.prototype.popupInit;
+popup.prototype['build'] = popup.prototype.build;
+popup.prototype['attach'] = popup.prototype.attach;
+popup.prototype['show'] = popup.prototype.show;

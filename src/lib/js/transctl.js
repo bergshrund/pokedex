@@ -27,6 +27,7 @@ transcontrol.prototype = {
 	code: false, // call return value without envelope (usually html code). This flag usually used together with rObj.eval = false 
     fatalHandler: null,
     tryagainHandler: null,
+    tryagainId:'tryagain',
     snackProgress: false,
     snackOnError: true,    
     snackOnTimeout: true,
@@ -130,8 +131,14 @@ transcontrol.prototype = {
 	    // 1 -> 3 (in)
 	    // 1 -> 2 (in)
 	    
-	    if(res.timeout == 1)
-	      this.transition(5,'in','Таймаут соединения'); 	    
+	    if(res.timeout == 1) {
+		  var script = byId(_this.rObj.rid.toString());
+	      if (script) var id = script.id;
+		  script && script.parentNode.removeChild(script);	
+			
+	      this.transition(5,'in','Connection timeout');
+	      _this.skip = true; 
+	      }	    
 	    else { 		  
 		  if (res.err) var errmsg = (res.retcode == 1 && res.err.button?res.err.button:null);
 	      this.transition(result == 'ok'?2:3,'in',errmsg);	      
@@ -163,7 +170,9 @@ transcontrol.prototype = {
 			   _this.transition(0,'in');
 			   
 			   var script = byId(_this.rObj.rid.toString());
-			   script && script.parentNode.removeChild(script)
+			   if (script) var id = script.id;
+			   script && script.parentNode.removeChild(script);
+			   
 			   
 			   if(_this.afterAll)
 			     _this.afterAll(res);
@@ -184,27 +193,29 @@ transcontrol.prototype = {
 
 
           					
-       for (var pr in stack) {
-						 
+       for (var pr in stack) {						 
 			  if (pr == 'text')
 			    this.parent.innerHTML = '<span>' + (text?text:stack[pr]) + '</span>';
-			  else if (pr == 'merr') 
-			    this.parent.innerHTML = "<div class='mderricon web1x-96dp web1x-cloud_off_black_96dp'></div><div class='mderrmsg'>" + (text?text:stack[pr]) + "</div><div class='empty-content-retry-button-container'><div class='material-flat-button' id='tryagain'><span class='material-flat-button-text color-main'>ПОПРОБОВАТЬ СНОВА</span><div class='material-flat-button-bg transitionall'></div></div></div></div>";			  
-			  else if (pr == 'value')
-			    this.parent.firstChild.value = stack[pr];
+			  else if (pr == 'merr') {			  				
+				var errc = document.createElement('div');
+				errc.id = 'error';
+				errc.className = 'error-container';
+			    errc.innerHTML = "<span>" + (stack[pr]?stack[pr]:text) + "</span><div class='button-container'></div>";			    			    
+			    errc.lastChild.appendChild((new flatButton(this.tryagainId,'TRY AGAIN')).add());			    			    
+			    this.parent.appendChild(errc);
+			    		    
+			    }
+			    //this.parent.innerHTML = "<div class='mderricon web1x-96dp web1x-cloud_off_black_96dp'></div><div class='mderrmsg'>" + (text?text:stack[pr]) + "</div><div class='empty-content-retry-button-container'><div class='material-flat-button' id='tryagain'><span class='material-flat-button-text color-main'>ПОПРОБОВАТЬ СНОВА</span><div class='material-flat-button-bg transitionall'></div></div></div></div>";
 			  else if (pr == 'style') {			   
 			    var ns = stack[pr].length;			    
 			    for (var i=0; i<ns; i++)
-			      for (var op in stack[pr][i])
-			        if (op == 'add')
-			           addClass(stack[pr][i][op],this.parent);		           
-			        else if (op == 'rm')   
-			           removeClass(stack[pr][i][op],this.parent);
-			    }
-			
-		     }
+			      for (var op in stack[pr][i])			        
+			        ((op == 'add') && addClass(stack[pr][i][op],this.parent)) || 
+			        ((op == 'rm') && removeClass(stack[pr][i][op],this.parent));
+			   }			
+		  }
 		
-		var ta = byId('tryagain',this.parent);
+		var ta = byId(this.tryagainId,this.parent);
 		if(ta) {
 		 if(this.tryagainHandler) {		   
 		   Event.removeall(ta,'click');
@@ -285,7 +296,7 @@ transcontrol.prototype = {
 	     var svg = document.createElementNS("http://www.w3.org/2000/svg",'svg');	     
 	     svg.setAttribute('width','24px');
 	     svg.setAttribute('height','24px');
-	     svg.setAttribute('viewBox','0 0 25 25');
+	     svg.setAttribute('viewBox','0 0 24 24');
 	     svg.setAttribute('xmlns',"http://www.w3.org/2000/svg");
 	     svg.setAttribute('class',this.progressSvgClass);
 	
@@ -293,7 +304,7 @@ transcontrol.prototype = {
 	     var circle = document.createElementNS("http://www.w3.org/2000/svg",'circle');
 	     circle.setAttribute('cx','12px');
 	     circle.setAttribute('cy','12px');
-	     circle.setAttribute('r','11px');
+	     circle.setAttribute('r','10px');
 	     circle.setAttribute('stroke',this.progressColor);
 	     circle.setAttribute('stroke-width','2px');
 	     circle.setAttribute('stroke-linecap','round');

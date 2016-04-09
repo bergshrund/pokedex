@@ -10,10 +10,12 @@ bind_textdomain_codeset($domain, $argv[2]);
 
 $rdir = preg_split('/_/',$argv[1]);
 ?>
+
 function pokedex() { return this.construct(); }
 
 pokedex.prototype = { 
  server: 'http://pokeapi.co/',
+ total: 778,
  apiVersion: 1,
  limit: 24,
  cursor: 1,
@@ -24,6 +26,7 @@ pokedex.prototype = {
  cardContainerStyle: 'column-2of6 column-1of2 column-1of1', 
  generations: [151,251,386,493,649,721],  
  
+ lastRid: 0,
  topPadding: 64,
  openedCard: false,
  features: [{title:<? print _("\"Атака\"")?>,value:'attack'},
@@ -143,34 +146,32 @@ pokedex.prototype = {
 		                      
 		                      }
 		                }];
-		                
-		                
-		                   	
+
 	var handlers = [{id:'sort',type:'click',                      
-                     body:function (event){ 
-						fixup(event);
-						var menu = new Menu(this);
-		                this.mo = menu;
-		                if(!menu) return false;		   		  
-		                menu.build(_this.sortmenu[0].spec) && menu.show('right-bottom-down');							 						 					
-				       }},
+                     body:function (event){
+                      fixup(event);
+                      var menu = new Menu(this);
+                      this.mo = menu;
+                      if(!menu) return false;
+                      menu.build(_this.sortmenu[0].spec) && menu.show('right-bottom-down');
+				      }},
 				    {id:'flt',type:'click',                      
-                      body:function (event){ 
-						fixup(event);
-						var menu = new Menu(this);
-		                this.mo = menu;
-		                if(!menu) return false;		   		  
-		                menu.build(_this.filtermenu[0].spec) && menu.show('right-bottom-down');							 						 					
-				       }},
-				     {id:'cfb',type:'click',                      
-                      body:function (event){ 
-						fixup(event);
-						_this.filterRemove({value:false});						
-				       }}  				       
-				    ];
-	
-	sethandlers(handlers);							 
-	return this;
+                     body:function (event){ 
+                      fixup(event);
+                      var menu = new Menu(this);
+                      this.mo = menu;
+                      if(!menu) return false;		   		  
+                      menu.build(_this.filtermenu[0].spec) && menu.show('right-bottom-down');							 						 					
+                      }},
+                    {id:'cfb',type:'click',                      
+                     body:function (event){ 
+                      fixup(event);
+                      _this.filterRemove({value:false});						
+                      }}  				       
+                    ];
+
+    sethandlers(handlers);							 
+    return this;
  },
 
 
@@ -229,45 +230,41 @@ pokedex.prototype = {
 	var rObj = request.rObj;	
 	rObj.url = url;
 	
-	request.showOkTimeout = 0;
+    request.showOkTimeout = 0;
     request.sendingTimeout = 1000;
     request.responseTimeout = 4000;    
     request.transitionTimeout = 1000;
     request.showSnackTimeout = 5000;
-	request.snackProgress = true;
-	request.progressContainer = 'stub';	
-	request.showErrTimeout = 0;	 
-	
-	request.tryagainHandler = function() {
-	
+    request.snackProgress = true;
+    request.progressContainer = 'stub';	
+    request.showErrTimeout = 0;
+    request.tryagainId = 'retry';
+    request.tryagainHandler = function() {	
 	   _this.mutex = false;	
-	   _this.getResource(url,resource,checkResult);
-		
+	   _this.getResource(url,resource,checkResult);		
 	 }
-					
-	request.trIn = [{},{},{},{},{snackText: 'Load '+ resource},{snackText: 'Loading ' + resource + ' timeout',snackAction:{text:'RETRY',handler:request.tryagainHandler}}];
+
+	request.trIn = [{},{},{},{},
+	                {snackText: 'Load '+ resource},
+	                {snackText: 'Loading ' + resource + ' timeout',snackAction:{text:'RETRY',handler:request.tryagainHandler}}];
 	request.trOut = [];
 	
 	rObj.parserName = 'parse' + resource; 
-	rObj.parserBody = function(result) {								
-	   	rObj.clearprogress(rObj);
-	   	if(!checkResult(result)) result.retcode = 1;
-	    rObj.callback && rObj.callback(result);					  
-	  };
-	
-	request.callbackOk = function(result) {		  				 														
-      _this[resource] = result;	
-      	
+	rObj.parserBody = function(result) {
+      rObj.clearprogress(rObj);
+      if(!checkResult(result)) result.retcode = 1;
+      rObj.callback && rObj.callback(result);
 	 };
-	
-		
-	
-	request.afterAll = function(){
-		 if(this.mutex == resource) _this.mutex = false;
-	   };  
-            
-	request.start(); 
 
+    request.callbackOk = function(result) {
+      _this[resource] = result;
+     };
+     
+    request.afterAll = function(){
+      if(this.mutex == resource) _this.mutex = false;
+     };
+                   
+	request.start(); 
   },	 
  
 /**
@@ -285,7 +282,7 @@ pokedex.prototype = {
 	  for(p=0;p<this.colors[n].pokemon_species.length;p++)
 	    if(this.colors[n].pokemon_species[p].name == name.toLowerCase())
 	      return this.colors[n].name;
-	return 0;      
+	return 'unknown';      
   },	 
  
  getTypeNameById: function(id) {
@@ -302,18 +299,17 @@ pokedex.prototype = {
  
  get: function() {
 	
-	if(this.mutex == 'getIndex') return; 	
-	this.mutex = 'getIndex';
+	if(this.mutex == 'getIndex' || this.total < this.cursor) return; 	
+	this.mutex = 'getIndex';	
 			
 	var _this = this;		
 	var request = new transcontrol(this.pokedexContainer); 
 	
 	var rObj = request.rObj;	
-	rObj.url = this.server+'api/v'+this.apiVersion+'/pokemon/?callback=parseResponse&limit='+this.limit+'&offset='+(this.cursor-1);			
-	        
+	rObj.url = this.server+'api/v'+this.apiVersion+'/pokemon/?callback=parseResponse&limit='+this.limit+'&offset='+(this.cursor-1);	
     request.showOkTimeout = 0;
     request.sendingTimeout = 1000;
-    request.responseTimeout = 18000;    
+    request.responseTimeout = 5000;    
     request.progresser = 'progresser';
     request.transitionTimeout = 0;
     request.snackOnError = false;
@@ -321,22 +317,31 @@ pokedex.prototype = {
 	request.showErrTimeout = 0;	 
 	request.progressContainer = this.pokedexContainer;
 		  
-	request.trIn = [];
+	request.trIn = [{},{},{},{},{},{merr:<? print _("\"Таймаут соединения\"")?>}];
 	request.trOut = [];   
 	
-	rObj.parserBody = function(result) {								
+	rObj.parserBody = function(result) {
+		try { byId(rObj.rid).id } catch(e) { return; }		
+				
+	    if(_this.lastRid == request.rObj.rid) return;
+		_this.lastRid = request.rObj.rid;
+				
 	   	rObj.clearprogress(rObj);
 	   	try {result.objects.length} catch(e) { result.retcode = 1; }	   		 	    	 	    	   
-	    rObj.callback && rObj.callback(result);					  
+	    rObj.callback && rObj.callback(result);
+	    					  
 	  }	
 	
 	request.callbackOk = function(result) {
-	
-	  _this.inrow = window.innerWidth > 960?3:2;
-	  
+		  		  
+	  if(request.skip) return;
+	 
+	  try {_this.total = result.meta.total_count;} catch(e) {}
+		  		  	  	 
+	  _this.inrow = window.innerWidth > 960?3:2;	  
 	  _this.colorize(result.objects);
 		  				 														
-      _this.data = _this.data.slice().concat(result.objects.slice());					
+      _this.data = _this.data.slice().concat(result.objects.slice());
 	  if(_this.sorted !== null || _this.filter.length > 0)
 		_this.sort();				                              	      
       else	// api v2 return sorted list by default 	
@@ -348,13 +353,20 @@ pokedex.prototype = {
 	request.callbackErr = function() {		  
 		  if (_this.mutex == 'getIndex') _this.mutex = false;
 		};   
-      
+    request.tryagainId = 'tryagain'; 
     request.tryagainHandler = function(){
+		
+		this.skip = false;
+		try {
+          var container = byId('pokedex');
+		  container.removeChild(container.lastChild);		   
+		  } catch(e) {}
+	     _this.get();
 		 
 	   };
     
     request.afterAll = function(){
-		 if (_this.mutex == 'getIndex') _this.mutex = false;
+		if (_this.mutex == 'getIndex') _this.mutex = false;
 	   };  
       
       
@@ -372,7 +384,7 @@ pokedex.prototype = {
  build: function(count) {		
 	var ep = this.cursor + count;
 	
-	while(this.cursor < ep)
+	while(this.cursor < ep && this.cursor < this.data.length)
 	  this.pokedexContainer.appendChild(this.buildRow(this.cursor));
 		
 	Waves.attach('.material-card',['waves-classic']);
@@ -434,6 +446,10 @@ pokedex.prototype = {
    card.className = 'material-card';
    card.id = cardData.national_id;  	 	 
    card.dataIndex = id;
+
+   if(card.id == '267') {
+     var xxx = 0;
+    }
 	 
    for (z = 0; z<cardData.egg_groups.length;z++)
 	 eggroops += (z>0?'-':'')+cardData.egg_groups[z].name;
@@ -443,7 +459,7 @@ pokedex.prototype = {
 	 types += '<span style="padding: 0px 3px">'+cardData.types[z].name+'</span>';            
      }
    
-   if(filtered) return false;	   
+   if(filtered || byId(card.id)) return false;	   
 	 
    card.innerHTML = "<div class='material-card-info to'>\
    <div class='card-title'><div><div>"+cardData.name+"</div>\
@@ -536,11 +552,16 @@ pokedex.prototype = {
 	var st = byId('content').scrollTop;
 	var wh = window.innerHeight;	
 	var h = this.pokedexContainer.clientHeight;
-	 	 
-	if (st + wh - this.topPadding == h)
-	  this.get();     
+			 	
+	if (st + wh - this.topPadding == h) {
+	  
+	  var err = byId('error');
+	  err && err.parentNode.removeChild(err);	
+		
+	  this.get();     	  	  	  
+     }
   },
- 
+   
  adjustTopMenu: function() {
 	document.body.style.paddingTop = byId('tm').clientHeight;
   },	 
@@ -683,7 +704,7 @@ pokedex.prototype = {
 		removeClass('show',w) && setTimeout(function() { removeClass('display',w); closePopup(_popup); },200);
 	  };
                       
-    openPopup(_popup,event,w,{div:wo},'ptypesmd');
+    openPopup(_popup,null,w,{div:wo},'ptypesmd');
     addClass('shadow',_popup.popupObj);
     try {  Waves.attach('.mdmitemhl',['waves-classic']);} catch(e) {}
         	              		 

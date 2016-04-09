@@ -202,6 +202,28 @@ radioButton.prototype = {
 	}    
 	
  };	
+
+function flatButton(id,text) { return this.construct(id,text); }
+
+flatButton.prototype = {
+   
+   b: null,   
+   construct: function(id,text) {	
+    this.b = document.createElement('div');
+    this.b.id = id;
+	this.b.className = 'material-flat-button';
+	this.b.innerHTML = "<span class='text main-color'>" + text + "</span>\
+	                    <div class='background ta'></div>";
+	                
+	return this;
+    
+    },
+   
+   add: function() {
+	  return this.b; 
+	}    
+	
+ }; 
  
 
 function chip(context,value) { return this.construct(context,value); } 

@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: POKEMONS 0.1b\n"
 "Report-Msgid-Bugs-To: bergsrund@gmail.com\n"
-"POT-Creation-Date: 2016-04-05 18:25+0300\n"
+"POT-Creation-Date: 2016-04-09 12:53+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,74 +16,78 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: pokemons.pjs:29
-msgid "\"Атака\""
-msgstr ""
-
-#: pokemons.pjs:30
-msgid "\"Защита\""
-msgstr ""
-
-#: pokemons.pjs:31
-msgid "\"Хиты\""
-msgstr ""
-
-#: pokemons.pjs:32
-msgid "\"Специальная атака\""
-msgstr ""
-
-#: pokemons.pjs:33
-msgid "\"Специальная защита\""
-msgstr ""
-
 #: pokemons.pjs:34
-msgid "\"Скорость\""
-msgstr ""
+msgid "\"Атака\""
+msgstr "\"Атака\""
 
 #: pokemons.pjs:35
-msgid "\"Вес\""
-msgstr ""
+msgid "\"Защита\""
+msgstr "\"Захист\""
 
 #: pokemons.pjs:36
+msgid "\"Хиты\""
+msgstr "\"Хіти\""
+
+#: pokemons.pjs:37
+msgid "\"Специальная атака\""
+msgstr "\"Спеціальна атака\""
+
+#: pokemons.pjs:38
+msgid "\"Специальная защита\""
+msgstr "\"Спеціальний захист\""
+
+#: pokemons.pjs:39
+msgid "\"Скорость\""
+msgstr "\"Швидкість\""
+
+#: pokemons.pjs:40
+msgid "\"Вес\""
+msgstr "\"Вага\""
+
+#: pokemons.pjs:41
 msgid "\"Возможных движений\""
-msgstr ""
+msgstr "\"Можливих рухів\""
 
-#: pokemons.pjs:65
+#: pokemons.pjs:70
 msgid "\"По индексу\""
-msgstr ""
+msgstr "\"За індексом\""
 
-#: pokemons.pjs:80
+#: pokemons.pjs:85
 msgid "\"По имени\""
-msgstr ""
+msgstr "\"За ім’ям\""
 
-#: pokemons.pjs:96
+#: pokemons.pjs:101
 msgid "\"По цвету\""
-msgstr ""
+msgstr "\"За кольором\""
 
-#: pokemons.pjs:117
+#: pokemons.pjs:122
 msgid "\"Типы\""
-msgstr ""
+msgstr "\"Типи\""
 
-#: pokemons.pjs:134
+#: pokemons.pjs:139
 msgid "\"Любимые\""
-msgstr ""
+msgstr "\"Улюблені\""
 
-#: pokemons.pjs:451
+#: pokemons.pjs:322
+msgid "\"Таймаут соединения\""
+msgstr "\"Таймаут з`єднання\""
+
+#: pokemons.pjs:469
 msgid "Тип:"
-msgstr ""
+msgstr "Тип:"
 
-#: pokemons.pjs:514
+#: pokemons.pjs:532
 msgid "\"Поколение \""
-msgstr ""
+msgstr "\"Покоління \""
 
-#: pokemons.pjs:698
+#: pokemons.pjs:721
 msgid "Тип покемона"
-msgstr ""
+msgstr "Тип покемону"
 
-#: pokemons.pjs:706
+#: pokemons.pjs:729
 msgid "OK"
-msgstr ""
+msgstr "ДОБРЕ"
 
-#: pokemons.pjs:708
+#: pokemons.pjs:731
 msgid "ОТМЕНА"
-msgstr ""
+msgstr "ВІДМІНА"

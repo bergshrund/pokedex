@@ -17,6 +17,9 @@ lib             type=dir
 
 /set type=file uname=pokemon gname=www mode=0644
 js              type=dir mode=0755
+    pokemons_en.cjs
+    pokemons_ru.cjs
+    pokemons_uk.cjs
 ..
 
 ..

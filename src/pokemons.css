@@ -202,13 +202,14 @@
     
     margin: auto auto !important;
     position: relative !important;
-    width: initial !important;
-    height: initial !important;
+    width: auto;
+    height: auto;
   
    }
   
   #wrapper.display {
-    display: flex !important;    
+    display: flex !important; 
+    align-items: center;   
    }
    
   .popup > .modal {    
@@ -271,6 +272,23 @@
       float: right;
       margin-right: 8px;
     }
+  
+  .error-container {
+     
+     padding-top: 20px;
+  
+    }
+  
+  .error-container > .button-container {
+     margin-top: 10px;
+   }
+  
+  .button-container > .material-flat-button {     
+     margin-left: auto;
+     margin-right: auto;
+     width: 200px;
+     overflow: hidden;     
+   }
   
   .material-flat-button {    
      position: relative;     
@@ -367,6 +385,7 @@
     }
     
   section.pokemons {
+    text-align: center;
     padding: 20px 20px 96px 20px;    
    } 
   
@@ -398,6 +417,7 @@
    }
   
   .container >.subheader {
+     text-align: left;
      height: 48px;
      line-height: 48px;
      margin-left: 26px;
@@ -723,15 +743,12 @@
      background-color: #ffffff;
      margin-left: auto;
      margin-right: auto;
-     /*top: 50%;
-     margin-top: -18px;*/
      box-shadow: 0px 1px 2px 0px #aaaaaa;                           
      }
    
    .progresscontainer {      
      display: flex;
-     align-items: center;
-   
+     align-items: center;   
      width: 100%;
      height: 96px;        
      background-color: transparent;
@@ -739,20 +756,7 @@
      top: 100%;
      left: 0px;     
      }
-    
-   /*.circular {
-     display: block;
-     position: absolute;
-     width: 24px;
-     height: 24px;
-     top: 6px;
-     left: 6px;     
-     
-     background-color: transparent;      
-     animation: progress 1.4s linear infinite;
-     -webkit-animation: progress 1.4s linear infinite;      
-     }*/
-    
+       
     .circular {
         width: 24px;
         height: 100%;
@@ -763,20 +767,30 @@
         margin-right: auto;
         background-color: transparent;      
         animation: progress 1.4s linear infinite;
-        -webkit-animation: progress 1.4s linear infinite;      
+        -webkit-animation: progress 1.4s linear infinite;
+        -moz-animation: progress 1.4s linear infinite;
+        -o-animation: progress 1.4s linear infinite;
+        -ms-animation: progress 1.4s linear infinite;      
        }
-    
-    
-    
+            
     .curform {
       width: 24px;
       height: 24px;
-      stroke-dasharray: 80;
+      stroke-dasharray: 70;
       stroke-dashoffset: 0;
+      
       transform-origin: center;
       -webkit-transform-origin: center;
+      -moz-transform-origin: center;
+      -ms-transform-origin: center;
+      -o-transform-origin: center;
+      
       animation: dash 1.4s ease-in-out infinite;
       -webkit-animation: dash 1.4s ease-in-out infinite;
+      -moz-animation: dash 1.4s ease-in-out infinite;
+      -ms-animation: dash 1.4s ease-in-out infinite;
+      -o-animation: dash 1.4s ease-in-out infinite;
+      
       }
     
     @keyframes progress {     
@@ -784,26 +798,76 @@
         100% { transform: rotate(270deg); }      
        }  
       
-      @-webkit-keyframes progress {     
+    @-webkit-keyframes progress {     
         0% { -webkit-transform: rotate(0deg); }
         100% { -webkit-transform: rotate(270deg); }      
        }
     
-    @keyframes dash {      
-        0% { stroke-dashoffset: 80; }
-        50% { stroke-dashoffset: 20;
-              transform:rotate(135deg); 
-              -webkit-transform:rotate(135deg);}
-        100% { stroke-dashoffset: 80;
-               transform:rotate(450deg);
-               -webkit-transform:rotate(450deg); }           
-       } 
+    @-moz-keyframes progress {     
+        0% { -moz-transform: rotate(0deg); }
+        100% { -moz-transform: rotate(270deg); }      
+       }
+    
+    @-ms-keyframes progress {     
+        0% { -ms-transform: rotate(0deg); }
+        100% { -ms-transform: rotate(270deg); }      
+       }
+    
+    @-o-keyframes progress {     
+        0% { -o-transform: rotate(0deg); }
+        100% { -o-transform: rotate(270deg); }      
+       }   
+       
+      
+    @keyframes dash {
+        0% { stroke-dashoffset: 70; }
+        
+        50% { stroke-dashoffset: 20;              
+              transform:rotate(135deg);         
+            }
+        
+        100% { stroke-dashoffset: 70;
+               transform:rotate(450deg);                              
+             }
+       }
       
     @-webkit-keyframes dash {      
-        0% { stroke-dashoffset: 80; }
-        50% { stroke-dashoffset: 20;-webkit-transform:rotate(135deg); }
-        100% { stroke-dashoffset: 80;-webkit-transform:rotate(450deg); }           
-       } 
+        0% { stroke-dashoffset: 70; }
+        
+        50% { stroke-dashoffset: 20;
+              -webkit-transform:rotate(135deg);
+            }
+              
+        100% { stroke-dashoffset: 70;
+              -webkit-transform:rotate(450deg);
+             }           
+       }
+    
+   @-moz-keyframes dash {      
+        0% { stroke-dashoffset: 70; }
+        50% { stroke-dashoffset: 20;
+              -moz-transform:rotate(135deg);}
+        100% { stroke-dashoffset: 80;
+              -moz-transform:rotate(450deg);}           
+       }
+        
+    
+    @-ms-keyframes dash {      
+        0% { stroke-dashoffset: 70; }
+        50% { stroke-dashoffset: 20;              
+              -ms-transform:rotate(135deg);}
+        100% { stroke-dashoffset: 70;               
+               -ms-transform:rotate(450deg); }           
+       }
+    
+    @-o-keyframes dash {      
+        0% { stroke-dashoffset: 70; }
+        50% { stroke-dashoffset: 20;              
+              -o-transform:rotate(135deg);}
+        100% { stroke-dashoffset: 70;               
+               -o-transform:rotate(450deg); }           
+       }    
+    
     
     .snack {    
       padding: 0px 24px;
@@ -829,11 +893,12 @@
      margin-top: -48px;       
     }
     
-    .snacks-progressbar {    
+   .snacks-progressbar {    
      position: absolute;
      top: 0px;
      left: 0px;     
      width: 56px;    
+     height: 48px;
     }
    
    .snack-span {   
