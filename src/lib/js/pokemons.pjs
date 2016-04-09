@@ -62,7 +62,7 @@ pokedex.prototype = {
 	Event.add(byId('content'),'scroll', function(event) { _this.getMore() });
 	Event.add(window,'resize', function(event) { _this.resize() });
     
-    this.sortmenu = [{id:'sort',
+        this.sortmenu = [{id:'sort',
 		              spec:{width: 3,
 		                    items: [{id: 'byindex',
 									  title:<? print _("\"По индексу\"")?>,
@@ -170,8 +170,8 @@ pokedex.prototype = {
                       }}  				       
                     ];
 
-    sethandlers(handlers);							 
-    return this;
+        sethandlers(handlers);							 
+        return this;
  },
 
 
@@ -230,18 +230,18 @@ pokedex.prototype = {
 	var rObj = request.rObj;	
 	rObj.url = url;
 	
-    request.showOkTimeout = 0;
-    request.sendingTimeout = 1000;
-    request.responseTimeout = 4000;    
-    request.transitionTimeout = 1000;
-    request.showSnackTimeout = 5000;
-    request.snackProgress = true;
-    request.progressContainer = 'stub';	
-    request.showErrTimeout = 0;
-    request.tryagainId = 'retry';
-    request.tryagainHandler = function() {	
-	   _this.mutex = false;	
-	   _this.getResource(url,resource,checkResult);		
+        request.showOkTimeout = 0;
+        request.sendingTimeout = 1000;
+        request.responseTimeout = 4000;    
+        request.transitionTimeout = 1000;
+        request.showSnackTimeout = 5000;
+        request.snackProgress = true;
+        request.progressContainer = 'stub';	
+        request.showErrTimeout = 0;
+        request.tryagainId = 'retry';
+        request.tryagainHandler = function() {	
+        _this.mutex = false;	
+	_this.getResource(url,resource,checkResult);		
 	 }
 
 	request.trIn = [{},{},{},{},
@@ -251,10 +251,10 @@ pokedex.prototype = {
 	
 	rObj.parserName = 'parse' + resource; 
 	rObj.parserBody = function(result) {
-      rObj.clearprogress(rObj);
-      if(!checkResult(result)) result.retcode = 1;
-      rObj.callback && rObj.callback(result);
-	 };
+        rObj.clearprogress(rObj);
+        if(!checkResult(result)) result.retcode = 1;
+        rObj.callback && rObj.callback(result);
+	};
 
     request.callbackOk = function(result) {
       _this[resource] = result;
@@ -263,8 +263,7 @@ pokedex.prototype = {
     request.afterAll = function(){
       if(this.mutex == resource) _this.mutex = false;
      };
-                   
-	request.start(); 
+    request.start(); 
   },	 
  
 /**
@@ -307,12 +306,12 @@ pokedex.prototype = {
 	
 	var rObj = request.rObj;	
 	rObj.url = this.server+'api/v'+this.apiVersion+'/pokemon/?callback=parseResponse&limit='+this.limit+'&offset='+(this.cursor-1);	
-    request.showOkTimeout = 0;
-    request.sendingTimeout = 1000;
-    request.responseTimeout = 5000;    
-    request.progresser = 'progresser';
-    request.transitionTimeout = 0;
-    request.snackOnError = false;
+        request.showOkTimeout = 0;
+        request.sendingTimeout = 1000;
+        request.responseTimeout = 5000;    
+        request.progresser = 'progresser';
+        request.transitionTimeout = 0;
+        request.snackOnError = false;
 	request.snackOnTimeout = false;
 	request.showErrTimeout = 0;	 
 	request.progressContainer = this.pokedexContainer;
@@ -328,7 +327,7 @@ pokedex.prototype = {
 				
 	   	rObj.clearprogress(rObj);
 	   	try {result.objects.length} catch(e) { result.retcode = 1; }	   		 	    	 	    	   
-	    rObj.callback && rObj.callback(result);
+	        rObj.callback && rObj.callback(result);
 	    					  
 	  }	
 	
@@ -341,10 +340,10 @@ pokedex.prototype = {
 	  _this.inrow = window.innerWidth > 960?3:2;	  
 	  _this.colorize(result.objects);
 		  				 														
-      _this.data = _this.data.slice().concat(result.objects.slice());
+          _this.data = _this.data.slice().concat(result.objects.slice());
 	  if(_this.sorted !== null || _this.filter.length > 0)
 		_this.sort();				                              	      
-      else	// api v2 return sorted list by default 	
+          else	// api v2 return sorted list by default 	
 		_this.build(_this.cursor - 1 + _this.limit > _this.data.length?
 		            _this.data.length-_this.cursor+1:_this.limit);		
 		  
@@ -353,19 +352,18 @@ pokedex.prototype = {
 	request.callbackErr = function() {		  
 		  if (_this.mutex == 'getIndex') _this.mutex = false;
 		};   
-    request.tryagainId = 'tryagain'; 
-    request.tryagainHandler = function(){
-		
+        request.tryagainId = 'tryagain'; 
+        request.tryagainHandler = function(){
 		this.skip = false;
 		try {
-          var container = byId('pokedex');
+                  var container = byId('pokedex');
 		  container.removeChild(container.lastChild);		   
 		  } catch(e) {}
 	     _this.get();
 		 
 	   };
     
-    request.afterAll = function(){
+        request.afterAll = function(){
 		if (_this.mutex == 'getIndex') _this.mutex = false;
 	   };  
       
@@ -404,18 +402,18 @@ pokedex.prototype = {
 	 // If card has been filtered	 
 	 if(card === false) { 
 	  this.cursor++;		 
-      n--;
-      first++;
-      var inrow = first + this.inrow <= this.data.length?this.inrow:this.data.length-first+1;
-      continue;
-      }
+          n--;
+          first++;
+          var inrow = first + this.inrow <= this.data.length?this.inrow:this.data.length-first+1;
+          continue;
+          }
 		 	 	 	 	
 	 if(g != null && this.currentGroup != null && g != this.currentGroup) {		    	 		
 	   this.currentGroup = g;	   	   	   	   
 	   fragment.appendChild(rowContainer);
 	   fragment.appendChild(this.buildGroupTitle());
 	   return fragment;	   	   	   	   	   	 	   
-       }
+          }
 	
 	 if(this.sorted && this.currentGroup == null)	   	   
 	   g && fragment.appendChild(this.buildGroupTitle(g));	   
@@ -423,7 +421,7 @@ pokedex.prototype = {
 	 this.currentGroup = g;	 
 	 		
 	 rowContainer.firstChild.appendChild(card);
-     this.cursor++;	 
+         this.cursor++;	 
     }   
                      
     fragment.appendChild(rowContainer);  
@@ -446,11 +444,7 @@ pokedex.prototype = {
    card.className = 'material-card';
    card.id = cardData.national_id;  	 	 
    card.dataIndex = id;
-
-   if(card.id == '267') {
-     var xxx = 0;
-    }
-	 
+   
    for (z = 0; z<cardData.egg_groups.length;z++)
 	 eggroops += (z>0?'-':'')+cardData.egg_groups[z].name;
 	 
@@ -482,40 +476,39 @@ pokedex.prototype = {
    Event.add(card,'click',function(event) { var _this = this; 
                                             if(!pokedexObj.openedCard) 
                                                {
-												 pokedexObj.openedCard = true;
-                                                 setTimeout(function(event){pokedexObj.openCard(_this.id)},300);
-                                               }});
+						pokedexObj.openedCard = true;
+                                                setTimeout(function(event){pokedexObj.openCard(_this.id)},300);
+                                          }});
 	 
    container.appendChild(card);
    return container;
   },
  
  filterAdd: function(value) {
-	this.showFilterBar(true);	
+    this.showFilterBar(true);	
     var fv = this.getTypeNameById(value).toLowerCase();
-	this.filter[this.filter.length] = fv;		 
-	byId('filterbar').firstChild.appendChild((new chip(this,fv)).add(this.filterRemove));
+    this.filter[this.filter.length] = fv;		 
+    byId('filterbar').firstChild.appendChild((new chip(this,fv)).add(this.filterRemove));
     this.rebuild(this.cursor - 1);    								 						 								
     this.adjustTopMenu();
    },	 
  
  filterRemove: function(chip) {		 
-	if(chip.value === false) {
-	  this.filter = [];  
-	  byId('filterbar').firstChild.innerHTML = '';    
-	 }
-	else { 		
-	 var p = this.filter.indexOf(chip.value);
-	 if(p > -1) this.filter.splice(p,1);
-	 chip.c.parentNode.removeChild(chip.c);
-	 delete chip;
+   if(chip.value === false) { 
+     this.filter = [];  
+     byId('filterbar').firstChild.innerHTML = '';    
+     }
+   else { 		
+     var p = this.filter.indexOf(chip.value);
+     if(p > -1) this.filter.splice(p,1);
+     chip.c.parentNode.removeChild(chip.c);
+     delete chip;
      }
 	
-	if(this.filter.length == 0 || chip.value === false) 
+   if(this.filter.length == 0 || chip.value === false) 
 	   this.showFilterBar(false);  
-	
-	this.rebuild(this.cursor - 1);	
-	this.adjustTopMenu();
+   this.rebuild(this.cursor - 1);	
+   this.adjustTopMenu();
    },	 
    	 
  sort: function(limit) {			 
@@ -554,12 +547,10 @@ pokedex.prototype = {
 	var h = this.pokedexContainer.clientHeight;
 			 	
 	if (st + wh - this.topPadding == h) {
-	  
 	  var err = byId('error');
-	  err && err.parentNode.removeChild(err);	
-		
+	  err && err.parentNode.removeChild(err);
 	  this.get();     	  	  	  
-     }
+        }
   },
    
  adjustTopMenu: function() {
@@ -611,10 +602,10 @@ pokedex.prototype = {
     
     // Build float button    
     var fb = new floatButton('favorit',t.firstChild);
-	fb.iconClassName = 'web1x-24dp web1x-star_outline_24dp';	
-	fb.className = 'material-fb-container ta fb-hidden';	 	 
-	fb.build('bgcolor-accent material-centered').attach('floatbutton-position');
-            
+    fb.iconClassName = 'web1x-24dp web1x-star_outline_24dp';	
+    fb.className = 'material-fb-container ta fb-hidden';	 	 
+    fb.build('bgcolor-accent material-centered').attach('floatbutton-position');
+           
     document.body.appendChild(t);
                
     // Add 'back' control    
@@ -625,28 +616,25 @@ pokedex.prototype = {
             
     // Start transition                      
     setTimeout(function(){	
-	  	
 	  removeClass('hide',t.firstChild);
 	  removeClass('hide',t.lastChild);	 	  	  		      
-      addClass('opened',t);                         
+          addClass('opened',t);                         
                       
-      setTimeout(function(){         
-         fb.show('fb-hidden');
+          setTimeout(function(){         
+            fb.show('fb-hidden');
 	    },300);
-                                                                                  
-     },50);  
-     
+       },50);
    },
   
  closeCard: function(id) {	
 	var t = byId(id);		
 	removeClass('opened',t);
-    back.style.display='none';
-    document.body.style.overflowY='hidden';
+        back.style.display='none';
+        document.body.style.overflowY='hidden';
 	byId('content').style.display='block';
-    byId('tm').style.display='block';
+        byId('tm').style.display='block';
     
-    setTimeout(function() {		
+        setTimeout(function() {		
 		removeClass('hide',byId('content'));
 		removeClass('hide',byId('tm'));				
 		},50);
@@ -675,8 +663,8 @@ pokedex.prototype = {
 	  document.body.style.paddingTop = this.topPadding = show?112:64;
 	  
 	  if(show) {
-		addClass('higtlight',byId('flt'));
-		byId('filterbar').style.display = 'block';
+	    addClass('higtlight',byId('flt'));
+	    byId('filterbar').style.display = 'block';
 	    return true;
 	   }
 	  
@@ -687,27 +675,25 @@ pokedex.prototype = {
    },	  
   
   selectTypes: function() {
-	
 	var w = byId('wrapper');		
 	try { w.id } catch(e) { return false }
 				
-    var wo = document.createElement('div');
-    wo.id = 'typesmd';
-    wo.className = 'modal material-dialog';
-    wo.appendChild(this.buildDialog());
+        var wo = document.createElement('div');
+        wo.id = 'typesmd';
+        wo.className = 'modal material-dialog';
+        wo.appendChild(this.buildDialog());
         
-    var popupData = {id:'ptypesmd', class: 'wrapped'};	            
-    var _popup = initPopup(popupData);	    
-    _popup.noclose = true; // modal popup
+        var popupData = {id:'ptypesmd', class: 'wrapped'};	            
+        var _popup = initPopup(popupData);	    
+        _popup.noclose = true; // modal popup
     
-    this.closeDialog = function() {
+        this.closeDialog = function() {
 		removeClass('show',w) && setTimeout(function() { removeClass('display',w); closePopup(_popup); },200);
 	  };
                       
-    openPopup(_popup,null,w,{div:wo},'ptypesmd');
-    addClass('shadow',_popup.popupObj);
-    try {  Waves.attach('.mdmitemhl',['waves-classic']);} catch(e) {}
-        	              		 
+        openPopup(_popup,null,w,{div:wo},'ptypesmd');
+        addClass('shadow',_popup.popupObj);
+        try {  Waves.attach('.mdmitemhl',['waves-classic']);} catch(e) {}
    },
   
   buildDialog: function() {	  	 
