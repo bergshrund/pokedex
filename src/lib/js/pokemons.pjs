@@ -683,7 +683,7 @@ pokedex.prototype = {
         wo.className = 'modal material-dialog';
         wo.appendChild(this.buildDialog());
         
-        var popupData = {id:'ptypesmd', class: 'wrapped'};	            
+        var popupData = {id:'ptypesmd', class: 'wrapped', width: 280};	            
         var _popup = initPopup(popupData);	    
         _popup.noclose = true; // modal popup
     
