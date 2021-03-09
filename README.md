@@ -1,7 +1,6 @@
 # pokedex
 
 Simple pokeapi.io client.
-See a working version on [http://pokemons.data-1.net](http://pokemons.data-1.net)
 
 ### Current Version : v0.0.2a
 
